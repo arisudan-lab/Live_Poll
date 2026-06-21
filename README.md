@@ -1,12 +1,13 @@
 # LivePoll — Decentralized Polling on Stellar
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Stellar](https://img.shields.io/badge/Stellar-Soroban-purple.svg)
 ![Next.js](https://img.shields.io/badge/Next.js-15-black.svg)
 
 **LivePoll** is a fully decentralized, real-time polling DApp built natively on the Stellar blockchain using Soroban smart contracts. It enables users to create, participate in, and track polls transparently, guaranteeing tamper-proof voting without central gatekeepers.
 
 The project demonstrates a complete, production-ready integration between a Next.js 15 frontend, the Stellar SDK, and a custom Rust-based Soroban smart contract.
+
+**[DEMO LINK]**(https://live-poll-gamma.vercel.app/)
 
 ---
 
@@ -143,6 +144,4 @@ If you want to deploy your own instance of the contract, please refer to the det
 
 ---
 
-## 📄 License
 
-This project is licensed under the [MIT License](LICENSE).
