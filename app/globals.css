@@ -4,19 +4,31 @@
 
 @import "tailwindcss";
 
-/* ─── Custom Properties ──────────────────────────────────────────────────── */
-
-:root {
-  --background: #09090b;
-  --foreground: #fafafa;
+@theme {
+  --color-primary: #0DA1E7;
+  --color-success: #22C45D;
+  --color-accent-orange: #F97415;
+  --color-accent-pink: #F53E5C;
+  --color-navy: #111828;
+  --color-bg: #0B0F14;
+  --color-surface: #151C28;
+  --color-border-subtle: rgba(255, 255, 255, 0.08);
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: rgba(255, 255, 255, 0.70);
+  
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  
+  --radius-lg: 12px;
+  --radius-xl: 16px;
 }
 
 /* ─── Base ───────────────────────────────────────────────────────────────── */
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -44,20 +56,21 @@ body {
 /* ─── Selection ──────────────────────────────────────────────────────────── */
 
 ::selection {
-  background: rgba(139, 92, 246, 0.3);
+  background: rgba(13, 161, 231, 0.3); /* Primary blue with opacity */
   color: white;
 }
 
 /* ─── Focus ──────────────────────────────────────────────────────────────── */
 
 *:focus-visible {
-  outline: 2px solid rgba(139, 92, 246, 0.5);
+  outline: 2px solid var(--color-primary);
   outline-offset: 2px;
   border-radius: 4px;
 }
 
-/* ─── Animations ─────────────────────────────────────────────────────────── */
+/* ─── Utility Classes ────────────────────────────────────────────────────── */
 
+/* Clean Animations */
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -72,7 +85,7 @@ body {
 @keyframes slide-in-from-top {
   from {
     opacity: 0;
-    transform: translateY(-12px);
+    transform: translateY(-8px);
   }
   to {
     opacity: 1;
@@ -80,80 +93,10 @@ body {
   }
 }
 
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-@keyframes glow-pulse {
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.15);
-  }
-  50% {
-    box-shadow: 0 0 40px rgba(139, 92, 246, 0.3);
-  }
-}
-
 .animate-in {
-  animation: fade-in 0.4s ease-out forwards;
+  animation: fade-in 0.3s ease-out forwards;
 }
 
 .slide-in-from-top-2 {
-  animation: slide-in-from-top 0.3s ease-out forwards;
-}
-
-.animate-shimmer {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.03) 50%,
-    transparent 100%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 2s infinite;
-}
-
-.animate-glow {
-  animation: glow-pulse 3s ease-in-out infinite;
-}
-
-/* ─── Gradient Text ──────────────────────────────────────────────────────── */
-
-.gradient-text {
-  background: linear-gradient(135deg, #8b5cf6, #06b6d4, #8b5cf6);
-  background-size: 200% 200%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: gradient-shift 5s ease infinite;
-}
-
-@keyframes gradient-shift {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-}
-
-/* ─── Glass ──────────────────────────────────────────────────────────────── */
-
-.glass {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-/* ─── Grid Pattern ───────────────────────────────────────────────────────── */
-
-.bg-grid-pattern {
-  background-image: 
-    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-  background-size: 60px 60px;
+  animation: slide-in-from-top 0.2s ease-out forwards;
 }

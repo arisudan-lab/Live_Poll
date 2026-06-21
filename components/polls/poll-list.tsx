@@ -72,8 +72,8 @@ export function PollList({
             className={cn(
               "px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200",
               filter === f.value
-                ? "bg-violet-500/20 text-violet-300 border border-violet-500/30"
-                : "bg-white/[0.04] text-zinc-400 border border-transparent hover:bg-white/[0.06] hover:text-white"
+                ? "bg-[var(--color-primary)] text-[var(--color-text-primary)] border border-[var(--color-primary)]"
+                : "bg-[var(--color-surface)] text-[var(--color-text-secondary)] border border-transparent hover:bg-[var(--color-bg)] hover:text-[var(--color-text-primary)]"
             )}
           >
             {f.label}
@@ -83,7 +83,7 @@ export function PollList({
 
       {filteredPolls.length === 0 ? (
         <EmptyState
-          icon={<BarChart3 className="w-7 h-7 text-violet-400" />}
+          icon={<BarChart3 className="w-7 h-7 text-[var(--color-primary)]" />}
           title="No polls found"
           description={
             filter === "all"

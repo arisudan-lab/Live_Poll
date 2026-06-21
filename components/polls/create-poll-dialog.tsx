@@ -89,25 +89,25 @@ export function CreatePollDialog({ open, onClose }: CreatePollDialogProps) {
       />
 
       {/* Dialog */}
-      <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-zinc-900 border border-white/[0.08] shadow-2xl">
+      <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-[var(--color-bg)] border border-[var(--color-border-subtle)] shadow-sm">
         {/* Header */}
-        <div className="sticky top-0 z-10 flex items-center justify-between p-6 pb-4 bg-zinc-900/95 backdrop-blur-sm border-b border-white/[0.06]">
+        <div className="sticky top-0 z-10 flex items-center justify-between p-6 pb-4 bg-[var(--color-bg)]/95 backdrop-blur-sm border-b border-[var(--color-border-subtle)]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-[var(--color-primary)] flex items-center justify-center">
               <Vote className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-white">
+              <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">
                 Create Poll
               </h2>
-              <p className="text-xs text-zinc-400">
+              <p className="text-xs text-[var(--color-text-secondary)]">
                 Create a new on-chain poll
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-white/[0.06] text-zinc-400 hover:text-white transition-colors"
+            className="p-2 rounded-lg hover:bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -117,7 +117,7 @@ export function CreatePollDialog({ open, onClose }: CreatePollDialogProps) {
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           {/* Title */}
           <div>
-            <label className="block text-sm font-medium text-zinc-300 mb-2">
+            <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
               Poll Title *
             </label>
             <input
@@ -126,13 +126,13 @@ export function CreatePollDialog({ open, onClose }: CreatePollDialogProps) {
               onChange={(e) => setTitle(e.target.value)}
               placeholder="What's your question?"
               maxLength={100}
-              className="w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/30 transition-all"
+              className="w-full px-4 py-3 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-subtle)] text-[var(--color-text-primary)] placeholder-[var(--color-text-secondary)] text-sm focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 transition-all"
             />
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-zinc-300 mb-2">
+            <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
               Description
             </label>
             <textarea
@@ -141,20 +141,20 @@ export function CreatePollDialog({ open, onClose }: CreatePollDialogProps) {
               placeholder="Add more context (optional)"
               rows={3}
               maxLength={500}
-              className="w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/30 transition-all resize-none"
+              className="w-full px-4 py-3 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-subtle)] text-[var(--color-text-primary)] placeholder-[var(--color-text-secondary)] text-sm focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 transition-all resize-none"
             />
           </div>
 
           {/* Options */}
           <div>
-            <label className="block text-sm font-medium text-zinc-300 mb-2">
+            <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
               Options * (min 2)
             </label>
             <div className="space-y-2">
               {options.map((option, index) => (
                 <div key={index} className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-violet-500/20 to-cyan-500/20 border border-white/[0.08] flex items-center justify-center flex-shrink-0">
-                    <span className="text-xs text-zinc-300">{index + 1}</span>
+                  <div className="w-6 h-6 rounded-full bg-[var(--color-surface)] border border-[var(--color-border-subtle)] flex items-center justify-center flex-shrink-0">
+                    <span className="text-xs text-[var(--color-text-secondary)]">{index + 1}</span>
                   </div>
                   <input
                     type="text"
@@ -162,13 +162,13 @@ export function CreatePollDialog({ open, onClose }: CreatePollDialogProps) {
                     onChange={(e) => updateOption(index, e.target.value)}
                     placeholder={`Option ${index + 1}`}
                     maxLength={100}
-                    className="flex-1 px-3 py-2.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-violet-500/50 transition-all"
+                    className="flex-1 px-3 py-2.5 rounded-lg bg-[var(--color-surface)] border border-[var(--color-border-subtle)] text-[var(--color-text-primary)] placeholder-[var(--color-text-secondary)] text-sm focus:outline-none focus:border-[var(--color-primary)] transition-all"
                   />
                   {options.length > 2 && (
                     <button
                       type="button"
                       onClick={() => removeOption(index)}
-                      className="p-2 rounded-lg hover:bg-red-500/10 text-zinc-500 hover:text-red-400 transition-colors"
+                      className="p-2 rounded-lg hover:bg-[var(--color-accent-pink)]/10 text-[var(--color-text-secondary)] hover:text-[var(--color-accent-pink)] transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -180,7 +180,7 @@ export function CreatePollDialog({ open, onClose }: CreatePollDialogProps) {
               <button
                 type="button"
                 onClick={addOption}
-                className="mt-2 flex items-center gap-2 text-sm text-violet-400 hover:text-violet-300 transition-colors"
+                className="mt-2 flex items-center gap-2 text-sm text-[var(--color-primary)] hover:brightness-110 transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 Add Option
@@ -195,16 +195,16 @@ export function CreatePollDialog({ open, onClose }: CreatePollDialogProps) {
                 type="checkbox"
                 checked={hasEndTime}
                 onChange={(e) => setHasEndTime(e.target.checked)}
-                className="rounded border-white/20 bg-white/[0.04] text-violet-500 focus:ring-violet-500/30"
+                className="rounded border-[var(--color-border-subtle)] bg-[var(--color-surface)] text-[var(--color-primary)] focus:ring-[var(--color-primary)]/30"
               />
-              <span className="text-sm text-zinc-300">Set end time</span>
+              <span className="text-sm text-[var(--color-text-primary)]">Set end time</span>
             </label>
             {hasEndTime && (
               <input
                 type="datetime-local"
                 value={endTimeStr}
                 onChange={(e) => setEndTimeStr(e.target.value)}
-                className="mt-2 w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white text-sm focus:outline-none focus:border-violet-500/50 transition-all [color-scheme:dark]"
+                className="mt-2 w-full px-4 py-3 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-subtle)] text-[var(--color-text-primary)] text-sm focus:outline-none focus:border-[var(--color-primary)] transition-all [color-scheme:dark]"
               />
             )}
           </div>
@@ -213,7 +213,7 @@ export function CreatePollDialog({ open, onClose }: CreatePollDialogProps) {
           <button
             type="submit"
             disabled={!isValid || createPoll.isPending}
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 disabled:from-zinc-700 disabled:to-zinc-700 disabled:cursor-not-allowed text-white font-medium text-sm shadow-lg shadow-violet-500/20 disabled:shadow-none transition-all duration-200 flex items-center justify-center gap-2"
+            className="w-full py-3 rounded-xl bg-[var(--color-primary)] hover:brightness-110 disabled:opacity-50 disabled:hover:brightness-100 disabled:cursor-not-allowed text-[var(--color-text-primary)] font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2"
           >
             {createPoll.isPending ? (
               <>
@@ -229,7 +229,7 @@ export function CreatePollDialog({ open, onClose }: CreatePollDialogProps) {
           </button>
 
           {!isConnected && (
-            <p className="text-center text-xs text-amber-400">
+            <p className="text-center text-xs text-[var(--color-accent-orange)]">
               Please connect your wallet to create a poll
             </p>
           )}

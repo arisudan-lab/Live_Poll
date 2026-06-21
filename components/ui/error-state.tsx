@@ -25,15 +25,15 @@ export function ErrorState({
         className
       )}
     >
-      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-500/20 to-orange-500/20 flex items-center justify-center mb-6 border border-red-500/20">
-        <AlertTriangle className="w-7 h-7 text-red-400" />
+      <div className="w-16 h-16 rounded-2xl bg-[var(--color-surface)] flex items-center justify-center mb-6 border border-[var(--color-border-subtle)]">
+        <AlertTriangle className="w-7 h-7 text-[var(--color-accent-orange)]" />
       </div>
-      <h3 className="text-lg font-semibold text-white mb-2">{title}</h3>
-      <p className="text-sm text-zinc-400 max-w-sm mb-6">{message}</p>
+      <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-2">{title}</h3>
+      <p className="text-sm text-[var(--color-text-secondary)] max-w-sm mb-6">{message}</p>
       {onRetry && (
         <button
           onClick={onRetry}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] text-sm text-white transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--color-surface)] hover:bg-[var(--color-bg)] border border-[var(--color-border-subtle)] text-sm text-[var(--color-text-primary)] transition-all duration-200"
         >
           <RefreshCw className="w-4 h-4" />
           Try Again

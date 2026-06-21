@@ -32,15 +32,15 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-xl bg-zinc-950/80 border-b border-white/[0.06]">
+    <header className="sticky top-0 z-50 backdrop-blur-xl bg-[var(--color-bg)]/80 border-b border-[var(--color-border-subtle)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-violet-500/20 group-hover:shadow-violet-500/40 transition-shadow">
+            <div className="w-8 h-8 rounded-lg bg-[var(--color-primary)] flex items-center justify-center shadow-sm">
               <Vote className="w-4 h-4 text-white" />
             </div>
-            <span className="text-lg font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
+            <span className="text-lg font-bold text-[var(--color-text-primary)]">
               LivePoll
             </span>
           </Link>
@@ -55,10 +55,10 @@ export function Header() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+                    "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200",
                     isActive
-                      ? "bg-white/[0.08] text-white"
-                      : "text-zinc-400 hover:text-white hover:bg-white/[0.04]"
+                      ? "bg-[var(--color-surface)] text-[var(--color-primary)]"
+                      : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface)]"
                   )}
                 >
                   <Icon className="w-4 h-4" />
@@ -72,7 +72,7 @@ export function Header() {
           <div className="flex items-center gap-3">
             <ConnectButton />
             <button
-              className="md:hidden p-2 rounded-lg hover:bg-white/[0.06] text-zinc-400"
+              className="md:hidden p-2 rounded-lg hover:bg-[var(--color-surface)] text-[var(--color-text-secondary)]"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? (
@@ -87,7 +87,7 @@ export function Header() {
 
       {/* Mobile Nav */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-white/[0.06] bg-zinc-950/95 backdrop-blur-xl">
+        <div className="md:hidden border-t border-[var(--color-border-subtle)] bg-[var(--color-bg)]/95 backdrop-blur-xl">
           <nav className="px-4 py-3 space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -98,10 +98,10 @@ export function Header() {
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
                   className={cn(
-                    "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all",
+                    "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors duration-200",
                     isActive
-                      ? "bg-white/[0.08] text-white"
-                      : "text-zinc-400 hover:text-white hover:bg-white/[0.04]"
+                      ? "bg-[var(--color-surface)] text-[var(--color-primary)]"
+                      : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface)]"
                   )}
                 >
                   <Icon className="w-5 h-5" />

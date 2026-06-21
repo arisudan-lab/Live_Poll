@@ -26,19 +26,18 @@ export default function PollDetailPage({
       {/* Back button */}
       <Link
         href="/polls"
-        className="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-white mb-6 transition-colors"
+        className="inline-flex items-center gap-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] mb-6 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         Back to Polls
       </Link>
 
       {/* Live indicator */}
-      <div className="flex items-center gap-2 mb-6 text-xs text-zinc-500">
+      <div className="flex items-center gap-2 mb-6 text-xs text-[var(--color-text-secondary)]">
         <TrendingUp className="w-3.5 h-3.5" />
         <span>Live results — refreshing every 5 seconds</span>
         <span className="relative flex h-1.5 w-1.5 ml-1">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400" />
+          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[var(--color-success)]" />
         </span>
       </div>
 

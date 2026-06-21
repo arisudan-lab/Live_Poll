@@ -27,11 +27,11 @@ export function EmptyState({
         className
       )}
     >
-      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500/20 to-cyan-500/20 flex items-center justify-center mb-6 border border-white/[0.08]">
-        {icon || <Inbox className="w-7 h-7 text-violet-400" />}
+      <div className="w-16 h-16 rounded-2xl bg-[var(--color-surface)] flex items-center justify-center mb-6 border border-[var(--color-border-subtle)]">
+        {icon || <Inbox className="w-7 h-7 text-[var(--color-primary)]" />}
       </div>
-      <h3 className="text-lg font-semibold text-white mb-2">{title}</h3>
-      <p className="text-sm text-zinc-400 max-w-sm mb-6">{description}</p>
+      <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-2">{title}</h3>
+      <p className="text-sm text-[var(--color-text-secondary)] max-w-sm mb-6">{description}</p>
       {action && <div>{action}</div>}
     </div>
   );

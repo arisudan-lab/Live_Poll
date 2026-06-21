@@ -17,14 +17,14 @@ export default function TransactionsPage() {
       {/* Page Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center border border-white/[0.08]">
-            <History className="w-5 h-5 text-amber-400" />
+          <div className="w-10 h-10 rounded-xl bg-[var(--color-bg)] flex items-center justify-center border border-[var(--color-border-subtle)]">
+            <History className="w-5 h-5 text-[var(--color-accent-orange)]" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-white">
+            <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">
               Transaction History
             </h1>
-            <p className="text-sm text-zinc-400">
+            <p className="text-sm text-[var(--color-text-secondary)]">
               {transactions.length > 0
                 ? `${transactions.length} transaction${transactions.length !== 1 ? "s" : ""}${
                     pendingCount > 0 ? ` (${pendingCount} pending)` : ""
@@ -37,7 +37,7 @@ export default function TransactionsPage() {
         {transactions.length > 0 && (
           <button
             onClick={clearTransactions}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.06] border border-white/[0.06] text-xs text-zinc-400 hover:text-white transition-all"
+            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--color-surface)] hover:bg-[var(--color-bg)] border border-[var(--color-border-subtle)] text-xs text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-all"
           >
             <Trash2 className="w-3.5 h-3.5" />
             Clear
@@ -50,7 +50,7 @@ export default function TransactionsPage() {
         <TransactionList transactions={transactions} />
       ) : (
         <EmptyState
-          icon={<History className="w-7 h-7 text-amber-400" />}
+          icon={<History className="w-7 h-7 text-[var(--color-text-secondary)]" />}
           title="No transactions yet"
           description="When you create polls, vote, or close polls, your transactions will be tracked here with their status and explorer links."
         />

@@ -20,18 +20,18 @@ const eventConfig: Record<
 > = {
   [ContractEventType.PollCreated]: {
     icon: Vote,
-    color: "text-violet-400",
-    bg: "bg-violet-500/10 border-violet-500/20",
+    color: "text-[var(--color-primary)]",
+    bg: "bg-[var(--color-primary)]/10 border-transparent",
   },
   [ContractEventType.VoteCast]: {
     icon: CheckCircle2,
-    color: "text-cyan-400",
-    bg: "bg-cyan-500/10 border-cyan-500/20",
+    color: "text-[var(--color-success)]",
+    bg: "bg-[var(--color-success)]/10 border-transparent",
   },
   [ContractEventType.PollClosed]: {
     icon: Lock,
-    color: "text-amber-400",
-    bg: "bg-amber-500/10 border-amber-500/20",
+    color: "text-[var(--color-accent-orange)]",
+    bg: "bg-[var(--color-accent-orange)]/10 border-transparent",
   },
 };
 
@@ -40,12 +40,11 @@ export function EventFeed({ events, isPolling }: EventFeedProps) {
     <div className="space-y-3">
       {/* Polling indicator */}
       {isPolling && (
-        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-500/5 border border-emerald-500/10 mb-4">
+        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--color-surface)] border border-[var(--color-border-subtle)] mb-4">
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--color-success)]" />
           </span>
-          <span className="text-xs text-emerald-400">
+          <span className="text-xs text-[var(--color-text-secondary)]">
             Live — Auto-updating
           </span>
         </div>
@@ -61,16 +60,16 @@ export function EventFeed({ events, isPolling }: EventFeedProps) {
 function EventItem({ event, index }: { event: ContractEvent; index: number }) {
   const config = eventConfig[event.type] || {
     icon: Activity,
-    color: "text-zinc-400",
-    bg: "bg-zinc-500/10 border-zinc-500/20",
+    color: "text-[var(--color-text-secondary)]",
+    bg: "bg-[var(--color-surface)] border-[var(--color-border-subtle)]",
   };
   const Icon = config.icon;
 
   return (
     <div
       className={cn(
-        "flex items-start gap-4 p-4 rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.03] transition-all duration-300",
-        index === 0 && "animate-in slide-in-from-top-2 duration-500"
+        "flex items-start gap-4 p-4 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface)] hover:bg-[var(--color-bg)] transition-colors duration-200",
+        index === 0 && "animate-in slide-in-from-top-2 duration-300"
       )}
       style={{ animationDelay: `${index * 50}ms` }}
     >
@@ -87,22 +86,22 @@ function EventItem({ event, index }: { event: ContractEvent; index: number }) {
       {/* Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
-          <span className="text-xs font-medium text-zinc-300 capitalize">
+          <span className="text-xs font-medium text-[var(--color-text-primary)] capitalize">
             {event.type ? event.type.replace("_", " ") : "Unknown"}
           </span>
-          <span className="text-xs text-zinc-600">•</span>
-          <span className="text-xs text-zinc-500" suppressHydrationWarning>
+          <span className="text-xs text-[var(--color-text-secondary)] opacity-50">•</span>
+          <span className="text-xs text-[var(--color-text-secondary)]" suppressHydrationWarning>
             {formatRelativeTime(event.timestamp)}
           </span>
         </div>
-        <p className="text-sm text-white">{event.action}</p>
-        <p className="text-xs text-zinc-500 mt-1 font-mono">
+        <p className="text-sm text-[var(--color-text-secondary)]">{event.action}</p>
+        <p className="text-xs text-[var(--color-text-secondary)] mt-1 font-mono opacity-70">
           {truncateAddress(event.walletAddress, 6)}
         </p>
       </div>
 
       {/* Ledger */}
-      <span className="text-xs text-zinc-600 font-mono flex-shrink-0">
+      <span className="text-xs text-[var(--color-text-secondary)] font-mono flex-shrink-0 opacity-50">
         #{event.ledger}
       </span>
     </div>

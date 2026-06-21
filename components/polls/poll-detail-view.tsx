@@ -31,16 +31,16 @@ interface PollDetailViewProps {
 }
 
 const optionColors = [
-  "from-violet-500 to-violet-600",
-  "from-cyan-500 to-cyan-600",
-  "from-amber-500 to-amber-600",
-  "from-emerald-500 to-emerald-600",
-  "from-rose-500 to-rose-600",
-  "from-indigo-500 to-indigo-600",
-  "from-pink-500 to-pink-600",
-  "from-teal-500 to-teal-600",
-  "from-orange-500 to-orange-600",
-  "from-fuchsia-500 to-fuchsia-600",
+  "bg-[var(--color-primary)]",
+  "bg-[var(--color-success)]",
+  "bg-[var(--color-accent-orange)]",
+  "bg-[var(--color-accent-pink)]",
+  "bg-blue-500",
+  "bg-teal-500",
+  "bg-purple-500",
+  "bg-emerald-500",
+  "bg-amber-500",
+  "bg-rose-500",
 ];
 
 export function PollDetailView({ poll }: PollDetailViewProps) {
@@ -82,23 +82,23 @@ export function PollDetailView({ poll }: PollDetailViewProps) {
   return (
     <div className="space-y-6">
       {/* Poll Header */}
-      <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-6">
+      <div className="rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface)] p-6">
         <div className="flex items-start justify-between gap-4 mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-white mb-2">
+            <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-2">
               {poll.title}
             </h1>
             {poll.description && (
-              <p className="text-sm text-zinc-400">{poll.description}</p>
+              <p className="text-sm text-[var(--color-text-secondary)]">{poll.description}</p>
             )}
           </div>
           <StatusBadge
             status={poll.status}
-            pulse={poll.status === PollStatus.Active}
+            pulse={false}
           />
         </div>
 
-        <div className="flex flex-wrap gap-4 text-sm text-zinc-400">
+        <div className="flex flex-wrap gap-4 text-sm text-[var(--color-text-secondary)]">
           <span className="flex items-center gap-1.5">
             <User className="w-4 h-4" />
             {truncateAddress(poll.creator, 4)}
@@ -121,16 +121,16 @@ export function PollDetailView({ poll }: PollDetailViewProps) {
       </div>
 
       {/* Voting / Results */}
-      <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-6">
-        <h2 className="text-lg font-semibold text-white mb-4">
+      <div className="rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface)] p-6">
+        <h2 className="text-lg font-semibold text-[var(--color-text-primary)] mb-4">
           {showResults ? "Results" : "Cast Your Vote"}
         </h2>
 
         {/* Already voted notice */}
         {hasVoted && (
-          <div className="flex items-center gap-2 mb-4 px-4 py-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-            <span className="text-sm text-emerald-300">
+          <div className="flex items-center gap-2 mb-4 px-4 py-3 rounded-lg bg-[var(--color-success)]/10 border border-[var(--color-success)]/20">
+            <CheckCircle2 className="w-4 h-4 text-[var(--color-success)]" />
+            <span className="text-sm text-[var(--color-success)]">
               You have already voted on this poll
             </span>
           </div>
@@ -138,9 +138,9 @@ export function PollDetailView({ poll }: PollDetailViewProps) {
 
         {/* Not connected notice */}
         {!isConnected && poll.status === PollStatus.Active && (
-          <div className="flex items-center gap-2 mb-4 px-4 py-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
-            <AlertCircle className="w-4 h-4 text-amber-400" />
-            <span className="text-sm text-amber-300">
+          <div className="flex items-center gap-2 mb-4 px-4 py-3 rounded-lg bg-[var(--color-accent-orange)]/10 border border-[var(--color-accent-orange)]/20">
+            <AlertCircle className="w-4 h-4 text-[var(--color-accent-orange)]" />
+            <span className="text-sm text-[var(--color-accent-orange)]">
               Connect your wallet to vote
             </span>
           </div>
@@ -162,20 +162,20 @@ export function PollDetailView({ poll }: PollDetailViewProps) {
                 onClick={() => canVote && setSelectedOption(index)}
                 disabled={!canVote}
                 className={cn(
-                  "w-full text-left rounded-xl border p-4 transition-all duration-300 relative overflow-hidden group",
+                  "w-full text-left rounded-xl border p-4 transition-all duration-200 relative overflow-hidden group",
                   canVote
-                    ? "cursor-pointer hover:border-violet-500/40"
+                    ? "cursor-pointer hover:border-[var(--color-primary)]"
                     : "cursor-default",
                   isSelected
-                    ? "border-violet-500/50 bg-violet-500/10"
-                    : "border-white/[0.08] bg-white/[0.02]"
+                    ? "border-[var(--color-primary)] bg-[var(--color-primary)]/10"
+                    : "border-[var(--color-border-subtle)] bg-[var(--color-bg)]"
                 )}
               >
                 {/* Background progress bar */}
                 {showResults && (
                   <div
                     className={cn(
-                      "absolute inset-0 bg-gradient-to-r opacity-10 transition-all duration-1000",
+                      "absolute inset-0 opacity-10 transition-all duration-1000",
                       colorClass
                     )}
                     style={{ width: `${percentage}%` }}
@@ -189,25 +189,25 @@ export function PollDetailView({ poll }: PollDetailViewProps) {
                         className={cn(
                           "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all",
                           isSelected
-                            ? "border-violet-500 bg-violet-500"
-                            : "border-zinc-600"
+                            ? "border-[var(--color-primary)] bg-[var(--color-primary)]"
+                            : "border-[var(--color-text-secondary)]"
                         )}
                       >
                         {isSelected && (
-                          <div className="w-2 h-2 rounded-full bg-white" />
+                          <div className="w-2 h-2 rounded-full bg-[var(--color-bg)]" />
                         )}
                       </div>
                     ) : (
                       <div
                         className={cn(
-                          "w-5 h-5 rounded-lg bg-gradient-to-br flex items-center justify-center text-[10px] font-bold text-white",
+                          "w-5 h-5 rounded-lg flex items-center justify-center text-[10px] font-bold text-white",
                           colorClass
                         )}
                       >
                         {index + 1}
                       </div>
                     )}
-                    <span className="text-sm font-medium text-white">
+                    <span className="text-sm font-medium text-[var(--color-text-primary)]">
                       {option.label}
                     </span>
                   </div>
@@ -215,11 +215,11 @@ export function PollDetailView({ poll }: PollDetailViewProps) {
                   <div className="flex items-center gap-3">
                     {showResults && (
                       <>
-                        <span className="text-xs text-zinc-400">
+                        <span className="text-xs text-[var(--color-text-secondary)]">
                           {option.voteCount} vote
                           {option.voteCount !== 1 ? "s" : ""}
                         </span>
-                        <span className="text-sm font-semibold text-white min-w-[3rem] text-right">
+                        <span className="text-sm font-semibold text-[var(--color-text-primary)] min-w-[3rem] text-right">
                           {percentage.toFixed(1)}%
                         </span>
                       </>
@@ -236,7 +236,7 @@ export function PollDetailView({ poll }: PollDetailViewProps) {
           <button
             onClick={handleVote}
             disabled={selectedOption === null || voteMutation.isPending}
-            className="mt-4 w-full py-3 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 disabled:from-zinc-700 disabled:to-zinc-700 disabled:cursor-not-allowed text-white font-medium text-sm shadow-lg shadow-violet-500/20 disabled:shadow-none transition-all duration-200 flex items-center justify-center gap-2"
+            className="mt-4 w-full py-3 rounded-xl bg-[var(--color-primary)] hover:brightness-110 disabled:opacity-50 disabled:hover:brightness-100 disabled:cursor-not-allowed text-[var(--color-text-primary)] font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2"
           >
             {voteMutation.isPending ? (
               <>
@@ -257,7 +257,7 @@ export function PollDetailView({ poll }: PollDetailViewProps) {
           <button
             onClick={handleClosePoll}
             disabled={closePollMutation.isPending}
-            className="mt-3 w-full py-3 rounded-xl bg-white/[0.04] hover:bg-white/[0.06] border border-white/[0.08] text-zinc-300 font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2"
+            className="mt-3 w-full py-3 rounded-xl bg-[var(--color-bg)] hover:brightness-110 border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2"
           >
             {closePollMutation.isPending ? (
               <>

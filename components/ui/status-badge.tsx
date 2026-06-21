@@ -14,18 +14,18 @@ interface StatusBadgeProps {
 const statusStyles: Record<string, string> = {
   // Poll statuses
   active:
-    "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+    "bg-[var(--color-success)]/10 text-[var(--color-success)] border-transparent",
   closed:
-    "bg-zinc-500/10 text-zinc-400 border-zinc-500/20",
+    "bg-[var(--color-surface)] text-[var(--color-text-secondary)] border-[var(--color-border-subtle)]",
   ended:
-    "bg-amber-500/10 text-amber-400 border-amber-500/20",
+    "bg-[var(--color-accent-orange)]/10 text-[var(--color-accent-orange)] border-transparent",
   // Transaction statuses
   pending:
-    "bg-amber-500/10 text-amber-400 border-amber-500/20",
+    "bg-[var(--color-accent-orange)]/10 text-[var(--color-accent-orange)] border-transparent",
   success:
-    "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+    "bg-[var(--color-success)]/10 text-[var(--color-success)] border-transparent",
   failed:
-    "bg-red-500/10 text-red-400 border-red-500/20",
+    "bg-[var(--color-accent-pink)]/10 text-[var(--color-accent-pink)] border-transparent",
 };
 
 export function StatusBadge({ status, className, pulse }: StatusBadgeProps) {
@@ -34,7 +34,7 @@ export function StatusBadge({ status, className, pulse }: StatusBadgeProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border",
+        "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-medium border",
         style,
         className
       )}
@@ -43,22 +43,12 @@ export function StatusBadge({ status, className, pulse }: StatusBadgeProps) {
         <span className="relative flex h-2 w-2">
           <span
             className={cn(
-              "animate-ping absolute inline-flex h-full w-full rounded-full opacity-75",
+              "relative inline-flex rounded-full h-1.5 w-1.5 m-auto",
               status === "active" || status === "success"
-                ? "bg-emerald-400"
+                ? "bg-[var(--color-success)]"
                 : status === "pending"
-                ? "bg-amber-400"
-                : "bg-red-400"
-            )}
-          />
-          <span
-            className={cn(
-              "relative inline-flex rounded-full h-2 w-2",
-              status === "active" || status === "success"
-                ? "bg-emerald-400"
-                : status === "pending"
-                ? "bg-amber-400"
-                : "bg-red-400"
+                ? "bg-[var(--color-accent-orange)]"
+                : "bg-[var(--color-accent-pink)]"
             )}
           />
         </span>
