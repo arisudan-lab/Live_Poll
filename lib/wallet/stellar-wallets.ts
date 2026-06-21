@@ -7,30 +7,24 @@
 import { NETWORK_CONFIG } from "@/lib/stellar/config";
 import { WalletError, WalletErrorType } from "@/types";
 
-// We use dynamic imports because the wallet kit uses browser APIs
-// that are not available during SSR in Next.js.
-
 let kitInitialized = false;
 let StellarWalletsKitModule: any = null;
 let UtilsModule: any = null;
+let NetworksEnum: any = null;
 
-/**
- * Dynamically import and initialize the StellarWalletsKit.
- * Must be called client-side only.
- */
 export async function initWalletKit(): Promise<void> {
   if (kitInitialized) return;
 
   try {
-    // Dynamic import to avoid SSR issues
     StellarWalletsKitModule = await import("@creit.tech/stellar-wallets-kit");
     UtilsModule = await import("@creit.tech/stellar-wallets-kit/modules/utils");
-    
-    const { StellarWalletsKit } = StellarWalletsKitModule;
-    const { defaultModules } = UtilsModule;
 
-    StellarWalletsKit.build({
-      network: NETWORK_CONFIG.network as "testnet" | "public",
+    const { StellarWalletsKit, Networks } = StellarWalletsKitModule;
+    const { defaultModules } = UtilsModule;
+    NetworksEnum = Networks;
+
+    StellarWalletsKit.init({
+      network: NETWORK_CONFIG.network === "public" ? Networks.PUBLIC : Networks.TESTNET,
       selectedWalletId: "freighter",
       modules: defaultModules(),
     });
@@ -56,15 +50,10 @@ export async function connectWallet(): Promise<string> {
 
   try {
     const { StellarWalletsKit } = StellarWalletsKitModule;
-    
-    // Open the built-in modal for wallet selection
-    await StellarWalletsKit.openModal({
-      onWalletSelected: async (option: { id: string }) => {
-        StellarWalletsKit.setWallet(option.id);
-      },
-    });
 
-    const { address } = await StellarWalletsKit.getAddress();
+    // authModal replaces old openModal — opens wallet picker AND returns address
+    const { address } = await StellarWalletsKit.authModal();
+
     if (!address) {
       throw new Error("No address returned from wallet");
     }
