@@ -10,9 +10,7 @@ in real time with complete transparency and immutability.
 
 ## 🔗 Project Links
 
-- GitHub Repository: <YOUR_GITHUB_REPO>
 - Live Demo: https://live-poll-gamma.vercel.app/
-- Demo Video: <YOUR_YOUTUBE_VIDEO>
 
 ---
 
