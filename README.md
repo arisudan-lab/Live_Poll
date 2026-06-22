@@ -34,9 +34,6 @@ in real time with complete transparency and immutability.
 ### 6. Mobile Responsive Design
 ![Mobile](public/screenshots/mobile.png)
 
-### 7. Stellar Expert Verification
-![Explorer](public/screenshots/explorer.png)
-
 ---
 
 ## ⛓ Deployed Addresses
