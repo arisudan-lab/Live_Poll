@@ -34,6 +34,9 @@ in real time with complete transparency and immutability.
 ### 6. Mobile Responsive Design
 ![Mobile](public/screenshots/mobile.png)
 
+### 7. Stellar Expert Verification
+![Explorer](public/screenshots/explorer.png)
+
 ---
 
 ## ⛓ Deployed Addresses
@@ -44,7 +47,7 @@ Contract ID:
 `YOUR_CONTRACT_ID`
 
 Deployer Address:
-`YOUR_WALLET_ADDRESS`
+`GCPHUOSNO74UQPDFMMXP2ZJZM7RHWGG4IQ6IFOVIQG27TN6JUHCCF3RO`
 
 Deployment Transaction:
 `YOUR_TX_HASH`
