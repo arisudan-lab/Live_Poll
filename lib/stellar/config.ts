@@ -16,7 +16,7 @@ export const NETWORK_CONFIG: NetworkConfig = {
     process.env.NEXT_PUBLIC_EXPLORER_URL ||
     "https://stellar.expert/explorer/testnet",
   contractId:
-    process.env.NEXT_PUBLIC_CONTRACT_ID || "CONTRACT_ADDRESS_HERE",
+    process.env.NEXT_PUBLIC_CONTRACT_ID || "CCA26PC7SVUMK43SVNHVSGQCTZ4NV3BSLDF7XV3ODHJVH5AFTYQWTJRU",
 };
 
 /**
