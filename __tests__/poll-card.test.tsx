@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { PollCard } from '../components/polls/poll-card';
-import { PollStatus } from '../types';
+import { PollStatus, Poll } from '../types';
 
 const poll = {
   id: 1,
@@ -19,7 +19,7 @@ const poll = {
 };
 
 test('renders poll card content', () => {
-  render(<PollCard poll={poll as any} />);
+  render(<PollCard poll={poll as unknown as Poll} />);
   expect(screen.getByText('Test poll')).toBeInTheDocument();
   expect(screen.getByText('This is a test poll.')).toBeInTheDocument();
   expect(screen.getByText('Option A')).toBeInTheDocument();

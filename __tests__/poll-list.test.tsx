@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PollList } from '../components/polls/poll-list';
-import { PollStatus } from '../types';
+import { PollStatus, Poll } from '../types';
 
 const polls = [
   {
@@ -41,7 +41,7 @@ test('renders loading state with skeletons', () => {
 });
 
 test('renders polls and filters by status', async () => {
-  render(<PollList polls={polls as any} isLoading={false} isError={false} error={null} />);
+  render(<PollList polls={polls as unknown as Poll[]} isLoading={false} isError={false} error={null} />);
   expect(screen.getByText('Favorite Stellar feature?')).toBeInTheDocument();
   expect(screen.getByText('Closed poll')).toBeInTheDocument();
 

@@ -8,9 +8,11 @@ import { NETWORK_CONFIG } from "@/lib/stellar/config";
 import { WalletError, WalletErrorType } from "@/types";
 
 let kitInitialized = false;
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 let StellarWalletsKitModule: any = null;
 let UtilsModule: any = null;
 let NetworksEnum: any = null;
+/* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 
 export async function initWalletKit(): Promise<void> {
   if (kitInitialized) return;
