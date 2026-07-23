@@ -11,6 +11,7 @@ in real time with complete transparency and immutability.
 ## 🔗 Project Links
 
 - **Live Demo**: [https://live-poll-gamma.vercel.app/](https://live-poll-gamma.vercel.app/)
+- **Demo Video**: [https://www.youtube.com/watch?v=demo_video_placeholder](https://www.youtube.com/watch?v=demo_video_placeholder)
 - **GitHub**: [https://github.com/arisudan-lab/Live_Poll](https://github.com/arisudan-lab/Live_Poll)
 - **Contract on Stellar Expert**: [View Contract](https://stellar.expert/explorer/testnet/contract/CCA26PC7SVUMK43SVNHVSGQCTZ4NV3BSLDF7XV3ODHJVH5AFTYQWTJRU)
 - **Contract on Stellar Lab**: [View on Lab](https://lab.stellar.org/r/testnet/contract/CCA26PC7SVUMK43SVNHVSGQCTZ4NV3BSLDF7XV3ODHJVH5AFTYQWTJRU)

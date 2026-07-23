@@ -37,7 +37,7 @@ mod tests {
     #[test]
     fn test_notify_and_get_event_count() {
         let e = Env::default();
-        let addr = Address::from(TestAddress::from_account_id(&e, &e.generate_account_id()));
+        let addr = Address::generate(&e);
         let topic = symbol_short!("poll");
 
         EventStreamContract::notify(e.clone(), topic.clone(), addr.clone(), 1);

@@ -271,7 +271,8 @@ mod tests {
     #[test]
     fn test_create_vote_close() {
         let e = Env::default();
-        let acc = Address::from(TestAddress::from_account_id(&e, &e.generate_account_id()));
+        e.mock_all_auths();
+        let acc = Address::generate(&e);
         let mut labels = Vec::new(&e);
         labels.push_back(String::from_slice(&e, "a"));
         labels.push_back(String::from_slice(&e, "b"));
@@ -279,7 +280,7 @@ mod tests {
         let poll = LivePollContract::get_poll(e.clone(), id);
         assert_eq!(poll.title, String::from_slice(&e, "Q?"));
 
-        let voter = Address::from(TestAddress::from_account_id(&e, &e.generate_account_id()));
+        let voter = Address::generate(&e);
         LivePollContract::vote(e.clone(), voter.clone(), id, 0);
         assert!(LivePollContract::get_voter(e.clone(), id, voter.clone()));
 
@@ -295,13 +296,22 @@ mod tests {
         assert!(matches!(p.status, PollStatus::Closed));
     }
 
+    #[contract]
+    pub struct MockEventContract;
+
+    #[contractimpl]
+    impl MockEventContract {
+        pub fn notify(_env: Env, _topic: Symbol, _source: Address, _poll_id: u32) {
+            // do nothing
+        }
+    }
+
     #[test]
     fn test_register_event_contract_and_notify() {
         let e = Env::default();
-        let admin = Address::from(TestAddress::from_account_id(&e, &e.generate_account_id()));
-        let mut b = [0u8;32];
-        b[0] = 9;
-        let cid = BytesN::from_array(&e, &b);
+        e.mock_all_auths();
+        let admin = Address::generate(&e);
+        let cid = e.register_contract(None, MockEventContract);
         LivePollContract::register_event_contract(e.clone(), admin.clone(), cid.clone());
 
         let mut labels = Vec::new(&e);
