@@ -38,7 +38,7 @@ mod tests {
     #[test]
     fn test_notify_and_get_event_count() {
         let e = Env::default();
-        let contract_id = e.register(EventStreamContract, ());
+        let contract_id = e.register_contract(None, EventStreamContract);
         let client = EventStreamContractClient::new(&e, &contract_id);
 
         let addr = Address::generate(&e);

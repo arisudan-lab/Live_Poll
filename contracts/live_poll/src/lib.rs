@@ -268,9 +268,6 @@ mod tests {
     use super::*;
     use soroban_sdk::Env;
 
-
-
-
     #[contract]
     pub struct MockEventContract;
 
@@ -284,19 +281,19 @@ mod tests {
         let e = Env::default();
         e.mock_all_auths();
 
-        let contract_id = e.register(LivePollContract, ());
+        let contract_id = e.register_contract(None, LivePollContract);
         let client = LivePollContractClient::new(&e, &contract_id);
 
         let acc = Address::generate(&e);
         let mut labels = Vec::new(&e);
-        labels.push_back(String::from_str(&e, "Option A"));
-        labels.push_back(String::from_str(&e, "Option B"));
+        labels.push_back(String::from_slice(&e, "Option A"));
+        labels.push_back(String::from_slice(&e, "Option B"));
 
-        let id = client.create_poll(&acc, &String::from_str(&e, "Test?"), &String::from_str(&e, "desc"), &labels, &0);
+        let id = client.create_poll(&acc, &String::from_slice(&e, "Test?"), &String::from_slice(&e, "desc"), &labels, &0);
         assert_eq!(id, 1);
 
         let poll = client.get_poll(&id);
-        assert_eq!(poll.title, String::from_str(&e, "Test?"));
+        assert_eq!(poll.title, String::from_slice(&e, "Test?"));
         assert_eq!(poll.options.len(), 2);
         assert_eq!(poll.total_votes, 0);
     }
@@ -306,17 +303,17 @@ mod tests {
         let e = Env::default();
         e.mock_all_auths();
 
-        let contract_id = e.register(LivePollContract, ());
+        let contract_id = e.register_contract(None, LivePollContract);
         let client = LivePollContractClient::new(&e, &contract_id);
 
         let creator = Address::generate(&e);
         let voter = Address::generate(&e);
 
         let mut labels = Vec::new(&e);
-        labels.push_back(String::from_str(&e, "Yes"));
-        labels.push_back(String::from_str(&e, "No"));
+        labels.push_back(String::from_slice(&e, "Yes"));
+        labels.push_back(String::from_slice(&e, "No"));
 
-        let id = client.create_poll(&creator, &String::from_str(&e, "Vote?"), &String::from_str(&e, "d"), &labels, &0);
+        let id = client.create_poll(&creator, &String::from_slice(&e, "Vote?"), &String::from_slice(&e, "d"), &labels, &0);
 
         client.vote(&voter, &id, &0);
         assert!(client.get_voter(&id, &voter));
@@ -331,15 +328,15 @@ mod tests {
         let e = Env::default();
         e.mock_all_auths();
 
-        let contract_id = e.register(LivePollContract, ());
+        let contract_id = e.register_contract(None, LivePollContract);
         let client = LivePollContractClient::new(&e, &contract_id);
 
         let creator = Address::generate(&e);
         let mut labels = Vec::new(&e);
-        labels.push_back(String::from_str(&e, "A"));
-        labels.push_back(String::from_str(&e, "B"));
+        labels.push_back(String::from_slice(&e, "A"));
+        labels.push_back(String::from_slice(&e, "B"));
 
-        let id = client.create_poll(&creator, &String::from_str(&e, "Close?"), &String::from_str(&e, "d"), &labels, &0);
+        let id = client.create_poll(&creator, &String::from_slice(&e, "Close?"), &String::from_slice(&e, "d"), &labels, &0);
         client.close_poll(&creator, &id);
 
         let poll = client.get_poll(&id);
@@ -351,21 +348,21 @@ mod tests {
         let e = Env::default();
         e.mock_all_auths();
 
-        let poll_contract_id = e.register(LivePollContract, ());
+        let poll_contract_id = e.register_contract(None, LivePollContract);
         let poll_client = LivePollContractClient::new(&e, &poll_contract_id);
 
-        let event_contract_id = e.register(MockEventContract, ());
+        let event_contract_id = e.register_contract(None, MockEventContract);
 
         let admin = Address::generate(&e);
         poll_client.register_event_contract(&admin, &event_contract_id);
 
         let mut labels = Vec::new(&e);
-        labels.push_back(String::from_str(&e, "X"));
-        labels.push_back(String::from_str(&e, "Y"));
+        labels.push_back(String::from_slice(&e, "X"));
+        labels.push_back(String::from_slice(&e, "Y"));
 
-        let id = poll_client.create_poll(&admin, &String::from_str(&e, "Event?"), &String::from_str(&e, "d"), &labels, &0);
+        let id = poll_client.create_poll(&admin, &String::from_slice(&e, "Event?"), &String::from_slice(&e, "d"), &labels, &0);
         let p = poll_client.get_poll(&id);
-        assert_eq!(p.title, String::from_str(&e, "Event?"));
+        assert_eq!(p.title, String::from_slice(&e, "Event?"));
     }
 
     #[test]
@@ -373,18 +370,18 @@ mod tests {
         let e = Env::default();
         e.mock_all_auths();
 
-        let contract_id = e.register(LivePollContract, ());
+        let contract_id = e.register_contract(None, LivePollContract);
         let client = LivePollContractClient::new(&e, &contract_id);
 
         let creator = Address::generate(&e);
         let mut labels = Vec::new(&e);
-        labels.push_back(String::from_str(&e, "A"));
-        labels.push_back(String::from_str(&e, "B"));
+        labels.push_back(String::from_slice(&e, "A"));
+        labels.push_back(String::from_slice(&e, "B"));
 
         // Create 3 polls
-        client.create_poll(&creator, &String::from_str(&e, "P1"), &String::from_str(&e, "d"), &labels, &0);
-        client.create_poll(&creator, &String::from_str(&e, "P2"), &String::from_str(&e, "d"), &labels, &0);
-        client.create_poll(&creator, &String::from_str(&e, "P3"), &String::from_str(&e, "d"), &labels, &0);
+        client.create_poll(&creator, &String::from_slice(&e, "P1"), &String::from_slice(&e, "d"), &labels, &0);
+        client.create_poll(&creator, &String::from_slice(&e, "P2"), &String::from_slice(&e, "d"), &labels, &0);
+        client.create_poll(&creator, &String::from_slice(&e, "P3"), &String::from_slice(&e, "d"), &labels, &0);
 
         assert_eq!(client.get_poll_count(), 3);
 
@@ -392,3 +389,4 @@ mod tests {
         assert_eq!(polls.len(), 3);
     }
 }
+
