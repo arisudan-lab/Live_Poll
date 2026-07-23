@@ -1,7 +1,7 @@
 #![no_std]
 
 use soroban_sdk::{
-    contract, contractimpl, contracttype, Address, Env, String, Symbol, Vec,
+    contract, contractimpl, contracttype, Address, Env, IntoVal, String, Symbol, Val, Vec,
 };
 
 #[contracttype]
@@ -99,11 +99,11 @@ impl LivePollContract {
 
         // If an EventStream contract is registered, notify it
         if let Some(event_addr) = env.storage().instance().get::<_, Address>(&DataKey::EventContract) {
-            let _: () = env.invoke_contract(
-                &event_addr,
-                &Symbol::new(&env, "notify"),
-                (Symbol::new(&env, "poll_created"), creator.clone(), next_id),
-            );
+            let mut args: Vec<Val> = Vec::new(&env);
+            args.push_back(Symbol::new(&env, "poll_created").into_val(&env));
+            args.push_back(creator.clone().into_val(&env));
+            args.push_back(next_id.into_val(&env));
+            let _: () = env.invoke_contract(&event_addr, &Symbol::new(&env, "notify"), args);
         }
 
         next_id
@@ -157,11 +157,11 @@ impl LivePollContract {
 
         // Notify event contract if present
         if let Some(event_addr) = env.storage().instance().get::<_, Address>(&DataKey::EventContract) {
-            let _: () = env.invoke_contract(
-                &event_addr,
-                &Symbol::new(&env, "notify"),
-                (Symbol::new(&env, "vote_cast"), voter.clone(), poll_id),
-            );
+            let mut args: Vec<Val> = Vec::new(&env);
+            args.push_back(Symbol::new(&env, "vote_cast").into_val(&env));
+            args.push_back(voter.clone().into_val(&env));
+            args.push_back(poll_id.into_val(&env));
+            let _: () = env.invoke_contract(&event_addr, &Symbol::new(&env, "notify"), args);
         }
     }
 
@@ -192,11 +192,11 @@ impl LivePollContract {
 
         // Notify event contract if present
         if let Some(event_addr) = env.storage().instance().get::<_, Address>(&DataKey::EventContract) {
-            let _: () = env.invoke_contract(
-                &event_addr,
-                &Symbol::new(&env, "notify"),
-                (Symbol::new(&env, "poll_closed"), creator.clone(), poll_id),
-            );
+            let mut args: Vec<Val> = Vec::new(&env);
+            args.push_back(Symbol::new(&env, "poll_closed").into_val(&env));
+            args.push_back(creator.clone().into_val(&env));
+            args.push_back(poll_id.into_val(&env));
+            let _: () = env.invoke_contract(&event_addr, &Symbol::new(&env, "notify"), args);
         }
     }
 
