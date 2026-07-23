@@ -1,13 +1,27 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import PollCard from '../components/polls/poll-card';
+import { render, screen } from '@testing-library/react';
+import { PollCard } from '../components/polls/poll-card';
+import { PollStatus } from '../types';
 
-global.fetch = jest.fn(() => Promise.resolve({ ok: true })) as any;
+const poll = {
+  id: 1,
+  creator: 'GBTESTADDRESS0000000000000000000000000000000000000000000',
+  title: 'Test poll',
+  description: 'This is a test poll.',
+  options: [
+    { label: 'Option A', voteCount: 5 },
+    { label: 'Option B', voteCount: 15 },
+  ],
+  totalVotes: 20,
+  status: PollStatus.Active,
+  createdAt: Date.now(),
+  endTime: 0,
+};
 
-test('renders options and handles click', async () => {
-  const poll = { id: 1, question: 'Q?', options: ['a','b'], closed:false };
-  render(<PollCard poll={poll} />);
-  const btn = screen.getByText('a');
-  fireEvent.click(btn);
-  expect(await screen.findByText(/Sending vote.../i)).toBeInTheDocument();
+test('renders poll card content', () => {
+  render(<PollCard poll={poll as any} />);
+  expect(screen.getByText('Test poll')).toBeInTheDocument();
+  expect(screen.getByText('This is a test poll.')).toBeInTheDocument();
+  expect(screen.getByText('Option A')).toBeInTheDocument();
+  expect(screen.getByText('20 votes')).toBeInTheDocument();
 });

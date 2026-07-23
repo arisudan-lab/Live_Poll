@@ -4,5 +4,8 @@ module.exports = {
     "^.+\\.(ts|tsx)$": "ts-jest"
   },
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json"],
-  setupFilesAfterEnv: ["@testing-library/jest-dom/extend-expect"]
+  setupFilesAfterEnv: ["@testing-library/jest-dom"],
+  moduleNameMapper: {
+    "^@/(.*)$": "<rootDir>/$1"
+  }
 };
