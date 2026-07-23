@@ -6,7 +6,7 @@
 
 import { useEffect, useCallback } from "react";
 import { useEventStore } from "@/stores/event-store";
-import { fetchContractEvents, getLatestLedger } from "@/lib/stellar/events";
+import { fetchContractEvents } from "@/lib/stellar/events";
 import { ContractEvent, ContractEventType } from "@/types";
 
 const POLL_INTERVAL = 8000; // Poll every 8 seconds

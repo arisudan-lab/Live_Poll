@@ -13,11 +13,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install Rust
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: stable
-      - name: Add wasm32 target
-        run: rustup target add wasm32-unknown-unknown
+          targets: wasm32-unknown-unknown
       - name: Build event_stream
         run: |
           cd contracts/event_stream
@@ -26,13 +24,13 @@ jobs:
         run: |
           cd contracts/live_poll
           cargo build --target wasm32-unknown-unknown --release
-      - name: Run Rust tests (contracts)
-        run: |
-          cd contracts/live_poll
-          cargo test --verbose
       - name: Run Rust tests (event_stream)
         run: |
           cd contracts/event_stream
+          cargo test --verbose
+      - name: Run Rust tests (live_poll)
+        run: |
+          cd contracts/live_poll
           cargo test --verbose
 
   frontend:
@@ -47,6 +45,8 @@ jobs:
           node-version: 20
       - name: Install
         run: npm ci
+      - name: Lint
+        run: npm run lint
       - name: Run tests
         run: npm test -- --passWithNoTests
       - name: Build

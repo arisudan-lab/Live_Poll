@@ -5,7 +5,7 @@
 "use client";
 
 import Link from "next/link";
-import { Poll, PollStatus } from "@/types";
+import { Poll } from "@/types";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { truncateAddress, formatRelativeTime } from "@/lib/stellar/config";
 import { Users, Clock, ArrowRight } from "lucide-react";
@@ -15,7 +15,7 @@ interface PollCardProps {
 }
 
 export function PollCard({ poll }: PollCardProps) {
-  const maxVotes = Math.max(...poll.options.map((o) => o.voteCount), 1);
+
 
   return (
     <Link href={`/polls/${poll.id}`} className="group block">

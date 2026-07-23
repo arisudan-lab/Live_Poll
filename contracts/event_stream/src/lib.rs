@@ -14,7 +14,8 @@ pub struct EventStreamContract;
 #[contractimpl]
 impl EventStreamContract {
     pub fn notify(env: Env, topic: Symbol, source: Address, poll_id: u32) {
-        env.events().publish((topic.clone(), poll_id), source.clone());
+        env.events()
+            .publish((topic.clone(), poll_id), source.clone());
 
         let key = DataKey::Count(topic);
         let current: u32 = env.storage().instance().get(&key).unwrap_or(0);
@@ -32,18 +33,21 @@ impl EventStreamContract {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use soroban_sdk::{testutils::Address as TestAddress, Env};
+    use soroban_sdk::Env;
 
     #[test]
     fn test_notify_and_get_event_count() {
         let e = Env::default();
+        let contract_id = e.register(EventStreamContract, ());
+        let client = EventStreamContractClient::new(&e, &contract_id);
+
         let addr = Address::generate(&e);
         let topic = symbol_short!("poll");
 
-        EventStreamContract::notify(e.clone(), topic.clone(), addr.clone(), 1);
-        EventStreamContract::notify(e.clone(), topic.clone(), addr.clone(), 2);
+        client.notify(&topic, &addr, &1);
+        client.notify(&topic, &addr, &2);
 
-        let count = EventStreamContract::get_event_count(e.clone(), topic.clone());
+        let count = client.get_event_count(&topic);
         assert_eq!(count, 2);
     }
 }

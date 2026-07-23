@@ -7,7 +7,6 @@
 import { useEvents } from "@/hooks/use-events";
 import { EventFeed } from "@/components/activity/event-feed";
 import { EmptyState } from "@/components/ui/empty-state";
-import { SkeletonList } from "@/components/ui/skeleton-card";
 import { Activity, Radio } from "lucide-react";
 
 export default function ActivityPage() {

@@ -15,7 +15,7 @@ interface EventStore {
   clearEvents: () => void;
 }
 
-export const useEventStore = create<EventStore>((set, get) => ({
+export const useEventStore = create<EventStore>((set) => ({
   events: [],
   lastLedger: 0,
   isPolling: false,

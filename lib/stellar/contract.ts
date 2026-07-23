@@ -5,7 +5,6 @@
 import {
   Contract,
   TransactionBuilder,
-  Networks,
   BASE_FEE,
   xdr,
   Address,
@@ -15,7 +14,7 @@ import {
 } from "@stellar/stellar-sdk";
 import { NETWORK_CONFIG } from "./config";
 import { sorobanServer } from "./server";
-import { Poll, PollOption, PollStatus } from "@/types";
+import { Poll, PollStatus } from "@/types";
 
 function getContract(): Contract {
   if (!NETWORK_CONFIG.contractId || !NETWORK_CONFIG.contractId.startsWith("C") || NETWORK_CONFIG.contractId.length !== 56) {

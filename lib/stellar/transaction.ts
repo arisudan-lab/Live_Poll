@@ -70,7 +70,7 @@ export async function waitForConfirmation(
  */
 export async function getAccountBalance(address: string): Promise<string> {
   try {
-    const account = await sorobanServer.getAccount(address);
+    await sorobanServer.getAccount(address);
     // Soroban RPC getAccount doesn't return balances directly;
     // we need to use the raw response or Horizon for balances.
     // For testnet, we approximate using the account sequence.

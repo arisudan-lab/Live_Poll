@@ -13,6 +13,7 @@ import { initWalletKit } from "@/lib/wallet/stellar-wallets";
  */
 export function useWallet() {
   const store = useWalletStore();
+  const { isConnected, address, refreshBalance } = store;
 
   useEffect(() => {
     // Initialize the wallet kit when the component mounts
@@ -21,14 +22,14 @@ export function useWallet() {
 
   // Periodically refresh balance when connected
   useEffect(() => {
-    if (!store.isConnected || !store.address) return;
+    if (!isConnected || !address) return;
 
     const interval = setInterval(() => {
-      store.refreshBalance();
+      refreshBalance();
     }, 30000); // Every 30 seconds
 
     return () => clearInterval(interval);
-  }, [store.isConnected, store.address]);
+  }, [isConnected, address, refreshBalance]);
 
   return store;
 }

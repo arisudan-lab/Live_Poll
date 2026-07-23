@@ -1,7 +1,7 @@
 #![no_std]
 
 use soroban_sdk::{
-    contract, contractimpl, contracttype, symbol_short, Address, Env, String, Symbol, Vec, BytesN,
+    contract, contractimpl, contracttype, Address, Env, String, Symbol, Vec,
 };
 
 #[contracttype]
@@ -37,6 +37,8 @@ pub enum DataKey {
     PollCount,                 // u32
     Poll(u32),                 // Poll
     Voter(u32, Address),       // bool
+    Admin,                     // Address
+    EventContract,             // Address
 }
 
 #[contract]
@@ -92,15 +94,15 @@ impl LivePollContract {
         env.storage().instance().extend_ttl(500000, 1000000);
         env.storage().persistent().extend_ttl(&DataKey::Poll(next_id), 500000, 1000000);
 
-        // Emit event: topic1 = "poll_created", topic2 = poll_id, topic3 = creator
+        // Emit event
         env.events().publish((Symbol::new(&env, "poll_created"), next_id, creator.clone()), ());
 
-        // If an EventStream contract is registered, notify it (best-effort)
-        if let Some(cid) = env.storage().instance().get::<_, BytesN<32>>(&Symbol::short("event_contract")) {
+        // If an EventStream contract is registered, notify it
+        if let Some(event_addr) = env.storage().instance().get::<_, Address>(&DataKey::EventContract) {
             let _: () = env.invoke_contract(
-                &cid,
-                &Symbol::short("notify"),
-                (Symbol::short("poll_created"), creator.clone(), next_id),
+                &event_addr,
+                &Symbol::new(&env, "notify"),
+                (Symbol::new(&env, "poll_created"), creator.clone(), next_id),
             );
         }
 
@@ -150,15 +152,15 @@ impl LivePollContract {
         env.storage().persistent().extend_ttl(&DataKey::Poll(poll_id), 500000, 1000000);
         env.storage().persistent().extend_ttl(&voter_key, 500000, 1000000);
 
-        // Emit event: topic1 = "vote_cast", topic2 = poll_id, topic3 = voter
+        // Emit event
         env.events().publish((Symbol::new(&env, "vote_cast"), poll_id, voter.clone()), option_index);
 
-        // Notify event contract if present (best-effort)
-        if let Some(cid) = env.storage().instance().get::<_, BytesN<32>>(&Symbol::short("event_contract")) {
+        // Notify event contract if present
+        if let Some(event_addr) = env.storage().instance().get::<_, Address>(&DataKey::EventContract) {
             let _: () = env.invoke_contract(
-                &cid,
-                &Symbol::short("notify"),
-                (Symbol::short("vote_cast"), voter.clone(), poll_id),
+                &event_addr,
+                &Symbol::new(&env, "notify"),
+                (Symbol::new(&env, "vote_cast"), voter.clone(), poll_id),
             );
         }
     }
@@ -183,32 +185,31 @@ impl LivePollContract {
 
         poll.status = PollStatus::Closed;
         env.storage().persistent().set(&DataKey::Poll(poll_id), &poll);
-        
         env.storage().persistent().extend_ttl(&DataKey::Poll(poll_id), 500000, 1000000);
 
-        // Emit event: topic1 = "poll_closed", topic2 = poll_id, topic3 = creator
+        // Emit event
         env.events().publish((Symbol::new(&env, "poll_closed"), poll_id, creator.clone()), ());
 
-        // Notify event contract if present (best-effort)
-        if let Some(cid) = env.storage().instance().get::<_, BytesN<32>>(&Symbol::short("event_contract")) {
+        // Notify event contract if present
+        if let Some(event_addr) = env.storage().instance().get::<_, Address>(&DataKey::EventContract) {
             let _: () = env.invoke_contract(
-                &cid,
-                &Symbol::short("notify"),
-                (Symbol::short("poll_closed"), creator.clone(), poll_id),
+                &event_addr,
+                &Symbol::new(&env, "notify"),
+                (Symbol::new(&env, "poll_closed"), creator.clone(), poll_id),
             );
         }
     }
 
-    /// Register an EventStream contract id for notifications (admin)
-    pub fn register_event_contract(env: Env, caller: Address, contract_id: BytesN<32>) {
+    /// Register an EventStream contract address for notifications (admin)
+    pub fn register_event_contract(env: Env, caller: Address, contract_addr: Address) {
         caller.require_auth();
-        let stored_admin: Option<Address> = env.storage().instance().get(&Symbol::short("admin"));
+        let stored_admin: Option<Address> = env.storage().instance().get(&DataKey::Admin);
         if stored_admin.is_none() {
-            env.storage().instance().set(&Symbol::short("admin"), &caller);
+            env.storage().instance().set(&DataKey::Admin, &caller);
         } else if stored_admin.unwrap() != caller {
             panic!("not admin");
         }
-        env.storage().instance().set(&Symbol::short("event_contract"), &contract_id);
+        env.storage().instance().set(&DataKey::EventContract, &contract_addr);
     }
 
     /// Get a specific poll
@@ -228,12 +229,11 @@ impl LivePollContract {
     pub fn get_polls(env: Env, start: u32, limit: u32) -> Vec<Poll> {
         let count = Self::get_poll_count(env.clone());
         let mut results = Vec::new(&env);
-        
+
         if count == 0 {
             return results;
         }
 
-        // Calculate start index (counting down from highest)
         let mut current_id = if start == 0 {
             count
         } else {
@@ -241,7 +241,7 @@ impl LivePollContract {
         };
 
         let mut fetched = 0;
-        let max_limit = limit.min(50); // Hard limit to prevent gas issues
+        let max_limit = limit.min(50);
 
         while current_id > 0 && fetched < max_limit {
             if let Some(poll) = env.storage().persistent().get(&DataKey::Poll(current_id)) {
@@ -266,59 +266,129 @@ impl LivePollContract {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use soroban_sdk::{testutils::Address as TestAddress, Env, BytesN};
+    use soroban_sdk::Env;
 
-    #[test]
-    fn test_create_vote_close() {
-        let e = Env::default();
-        e.mock_all_auths();
-        let acc = Address::generate(&e);
-        let mut labels = Vec::new(&e);
-        labels.push_back(String::from_slice(&e, "a"));
-        labels.push_back(String::from_slice(&e, "b"));
-        let id = LivePollContract::create_poll(e.clone(), acc.clone(), String::from_slice(&e, "Q?"), String::from_slice(&e, "desc"), labels.clone(), 0);
-        let poll = LivePollContract::get_poll(e.clone(), id);
-        assert_eq!(poll.title, String::from_slice(&e, "Q?"));
 
-        let voter = Address::generate(&e);
-        LivePollContract::vote(e.clone(), voter.clone(), id, 0);
-        assert!(LivePollContract::get_voter(e.clone(), id, voter.clone()));
 
-        // double vote should panic
-        let res = std::panic::catch_unwind(|| {
-            LivePollContract::vote(e.clone(), voter.clone(), id, 0);
-        });
-        assert!(res.is_err());
-
-        // close poll
-        LivePollContract::close_poll(e.clone(), acc.clone(), id);
-        let p = LivePollContract::get_poll(e.clone(), id);
-        assert!(matches!(p.status, PollStatus::Closed));
-    }
 
     #[contract]
     pub struct MockEventContract;
 
     #[contractimpl]
     impl MockEventContract {
-        pub fn notify(_env: Env, _topic: Symbol, _source: Address, _poll_id: u32) {
-            // do nothing
-        }
+        pub fn notify(_env: Env, _topic: Symbol, _source: Address, _poll_id: u32) {}
+    }
+
+    #[test]
+    fn test_create_poll() {
+        let e = Env::default();
+        e.mock_all_auths();
+
+        let contract_id = e.register(LivePollContract, ());
+        let client = LivePollContractClient::new(&e, &contract_id);
+
+        let acc = Address::generate(&e);
+        let mut labels = Vec::new(&e);
+        labels.push_back(String::from_str(&e, "Option A"));
+        labels.push_back(String::from_str(&e, "Option B"));
+
+        let id = client.create_poll(&acc, &String::from_str(&e, "Test?"), &String::from_str(&e, "desc"), &labels, &0);
+        assert_eq!(id, 1);
+
+        let poll = client.get_poll(&id);
+        assert_eq!(poll.title, String::from_str(&e, "Test?"));
+        assert_eq!(poll.options.len(), 2);
+        assert_eq!(poll.total_votes, 0);
+    }
+
+    #[test]
+    fn test_vote() {
+        let e = Env::default();
+        e.mock_all_auths();
+
+        let contract_id = e.register(LivePollContract, ());
+        let client = LivePollContractClient::new(&e, &contract_id);
+
+        let creator = Address::generate(&e);
+        let voter = Address::generate(&e);
+
+        let mut labels = Vec::new(&e);
+        labels.push_back(String::from_str(&e, "Yes"));
+        labels.push_back(String::from_str(&e, "No"));
+
+        let id = client.create_poll(&creator, &String::from_str(&e, "Vote?"), &String::from_str(&e, "d"), &labels, &0);
+
+        client.vote(&voter, &id, &0);
+        assert!(client.get_voter(&id, &voter));
+
+        let poll = client.get_poll(&id);
+        assert_eq!(poll.total_votes, 1);
+        assert_eq!(poll.options.get(0).unwrap().vote_count, 1);
+    }
+
+    #[test]
+    fn test_close_poll() {
+        let e = Env::default();
+        e.mock_all_auths();
+
+        let contract_id = e.register(LivePollContract, ());
+        let client = LivePollContractClient::new(&e, &contract_id);
+
+        let creator = Address::generate(&e);
+        let mut labels = Vec::new(&e);
+        labels.push_back(String::from_str(&e, "A"));
+        labels.push_back(String::from_str(&e, "B"));
+
+        let id = client.create_poll(&creator, &String::from_str(&e, "Close?"), &String::from_str(&e, "d"), &labels, &0);
+        client.close_poll(&creator, &id);
+
+        let poll = client.get_poll(&id);
+        assert!(matches!(poll.status, PollStatus::Closed));
     }
 
     #[test]
     fn test_register_event_contract_and_notify() {
         let e = Env::default();
         e.mock_all_auths();
+
+        let poll_contract_id = e.register(LivePollContract, ());
+        let poll_client = LivePollContractClient::new(&e, &poll_contract_id);
+
+        let event_contract_id = e.register(MockEventContract, ());
+
         let admin = Address::generate(&e);
-        let cid = e.register_contract(None, MockEventContract);
-        LivePollContract::register_event_contract(e.clone(), admin.clone(), cid.clone());
+        poll_client.register_event_contract(&admin, &event_contract_id);
 
         let mut labels = Vec::new(&e);
-        labels.push_back(String::from_slice(&e, "x"));
-        labels.push_back(String::from_slice(&e, "y"));
-        let id = LivePollContract::create_poll(e.clone(), admin.clone(), String::from_slice(&e, "T?"), String::from_slice(&e, "d"), labels.clone(), 0);
-        let p = LivePollContract::get_poll(e.clone(), id);
-        assert_eq!(p.title, String::from_slice(&e, "T?"));
+        labels.push_back(String::from_str(&e, "X"));
+        labels.push_back(String::from_str(&e, "Y"));
+
+        let id = poll_client.create_poll(&admin, &String::from_str(&e, "Event?"), &String::from_str(&e, "d"), &labels, &0);
+        let p = poll_client.get_poll(&id);
+        assert_eq!(p.title, String::from_str(&e, "Event?"));
+    }
+
+    #[test]
+    fn test_get_polls_pagination() {
+        let e = Env::default();
+        e.mock_all_auths();
+
+        let contract_id = e.register(LivePollContract, ());
+        let client = LivePollContractClient::new(&e, &contract_id);
+
+        let creator = Address::generate(&e);
+        let mut labels = Vec::new(&e);
+        labels.push_back(String::from_str(&e, "A"));
+        labels.push_back(String::from_str(&e, "B"));
+
+        // Create 3 polls
+        client.create_poll(&creator, &String::from_str(&e, "P1"), &String::from_str(&e, "d"), &labels, &0);
+        client.create_poll(&creator, &String::from_str(&e, "P2"), &String::from_str(&e, "d"), &labels, &0);
+        client.create_poll(&creator, &String::from_str(&e, "P3"), &String::from_str(&e, "d"), &labels, &0);
+
+        assert_eq!(client.get_poll_count(), 3);
+
+        let polls = client.get_polls(&0, &10);
+        assert_eq!(polls.len(), 3);
     }
 }

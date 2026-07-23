@@ -4,7 +4,7 @@
 
 "use client";
 
-import { TransactionRecord, TransactionStatus, TransactionType } from "@/types";
+import { TransactionRecord, TransactionType } from "@/types";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { truncateAddress, formatRelativeTime } from "@/lib/stellar/config";
 import {
