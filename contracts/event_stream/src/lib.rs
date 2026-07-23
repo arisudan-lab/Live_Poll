@@ -1,61 +1,49 @@
 #![no_std]
-extern crate alloc;
-use alloc::vec::Vec;
-use soroban_sdk::{contractimpl, contracttype, Address, Env, IntoVal, Map, Symbol, Vec as SorobanVec, BytesN};
+
+use soroban_sdk::{contract, contractimpl, contracttype, symbol_short, Address, Env, Symbol};
 
 #[contracttype]
 #[derive(Clone)]
-pub struct EventRecord {
-    pub source: Address,
-    pub topic: Symbol,
-    pub payload: Vec<u8>,
+pub enum DataKey {
+    Count(Symbol),
 }
 
+#[contract]
 pub struct EventStreamContract;
 
 #[contractimpl]
 impl EventStreamContract {
-    pub fn notify(e: Env, topic: Symbol, payload: Vec<u8>, source: Address) {
-        // Publish a contract-level event
-        e.events().publish((topic.clone(),), (source.clone(), payload.clone()));
+    pub fn notify(env: Env, topic: Symbol, source: Address, poll_id: u32) {
+        env.events().publish((topic.clone(), poll_id), source.clone());
 
-        // store small history per topic (bounded)
-        let key = (Symbol::short("history"), topic.clone());
-        let mut map: Map<_, SorobanVec<EventRecord>> = e.storage().get(&key).unwrap_or_else(|| Map::new(&e));
-        let mut vec = map.get(&Symbol::short("items")).unwrap_or_else(|| SorobanVec::new(&e));
-        let rec = EventRecord { source, topic, payload };
-        vec.push_back(rec);
-        map.set(&Symbol::short("items"), &vec);
-        e.storage().set(&key, &map);
+        let key = DataKey::Count(topic);
+        let current: u32 = env.storage().instance().get(&key).unwrap_or(0);
+        env.storage().instance().set(&key, &(current + 1));
     }
 
-    pub fn get_events(e: Env, topic: Symbol, limit: u32) -> SorobanVec<EventRecord> {
-        let key = (Symbol::short("history"), topic);
-        let map: Map<_, SorobanVec<EventRecord>> = e.storage().get(&key).unwrap_or_else(|| Map::new(&e));
-        let vec = map.get(&Symbol::short("items")).unwrap_or_else(|| SorobanVec::new(&e));
-        let mut out = SorobanVec::new(&e);
-        let l = core::cmp::min(limit, 100);
-        let len = vec.len();
-        let start = if len > l as usize { len - l as usize } else { 0 };
-        for i in start..len {
-            out.push_back(vec.get(i));
-        }
-        out
+    pub fn get_event_count(env: Env, topic: Symbol) -> u32 {
+        env.storage()
+            .instance()
+            .get(&DataKey::Count(topic))
+            .unwrap_or(0)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use soroban_sdk::{testutils::Address as TestAddress, Env, Symbol};
+    use soroban_sdk::{testutils::Address as TestAddress, Env};
 
     #[test]
-    fn test_notify_and_get_events() {
+    fn test_notify_and_get_event_count() {
         let e = Env::default();
         let addr = Address::from(TestAddress::from_account_id(&e, &e.generate_account_id()));
-        let topic = Symbol::short("poll");
-        EventStreamContract::notify(e.clone(), topic.clone(), b"payload".to_vec(), addr.clone());
-        let events = EventStreamContract::get_events(e.clone(), topic.clone(), 10);
-        assert!(events.len() > 0);
+        let topic = symbol_short!("poll");
+
+        EventStreamContract::notify(e.clone(), topic.clone(), addr.clone(), 1);
+        EventStreamContract::notify(e.clone(), topic.clone(), addr.clone(), 2);
+
+        let count = EventStreamContract::get_event_count(e.clone(), topic.clone());
+        assert_eq!(count, 2);
     }
 }

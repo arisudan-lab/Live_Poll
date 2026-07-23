@@ -97,7 +97,11 @@ impl LivePollContract {
 
         // If an EventStream contract is registered, notify it (best-effort)
         if let Some(cid) = env.storage().instance().get::<_, BytesN<32>>(&Symbol::short("event_contract")) {
-            let _ = env.invoke_contract(&cid, &Symbol::short("notify"), (Symbol::short("poll_created"), poll.title.clone(), creator.clone()));
+            let _: () = env.invoke_contract(
+                &cid,
+                &Symbol::short("notify"),
+                (Symbol::short("poll_created"), creator.clone(), next_id),
+            );
         }
 
         next_id
@@ -151,7 +155,11 @@ impl LivePollContract {
 
         // Notify event contract if present (best-effort)
         if let Some(cid) = env.storage().instance().get::<_, BytesN<32>>(&Symbol::short("event_contract")) {
-            let _ = env.invoke_contract(&cid, &Symbol::short("notify"), (Symbol::short("vote_cast"), option_index, voter.clone()));
+            let _: () = env.invoke_contract(
+                &cid,
+                &Symbol::short("notify"),
+                (Symbol::short("vote_cast"), voter.clone(), poll_id),
+            );
         }
     }
 
@@ -183,7 +191,11 @@ impl LivePollContract {
 
         // Notify event contract if present (best-effort)
         if let Some(cid) = env.storage().instance().get::<_, BytesN<32>>(&Symbol::short("event_contract")) {
-            let _ = env.invoke_contract(&cid, &Symbol::short("notify"), (Symbol::short("poll_closed"), poll_id, creator.clone()));
+            let _: () = env.invoke_contract(
+                &cid,
+                &Symbol::short("notify"),
+                (Symbol::short("poll_closed"), creator.clone(), poll_id),
+            );
         }
     }
 
