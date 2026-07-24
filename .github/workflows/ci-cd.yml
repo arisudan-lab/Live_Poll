@@ -19,13 +19,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32-unknown-unknown
           toolchain: ${{ env.RUST_VERSION }}
-      
+
       - name: Cache Rust dependencies
         uses: actions/cache@v4
         with:
@@ -34,31 +34,49 @@ jobs:
             ~/.cargo/git
             contracts/**/target
           key: ${{ runner.os }}-rust-${{ hashFiles('contracts/**/Cargo.toml') }}
-      
+
       - name: Build event_stream contract
         run: |
           cd contracts/event_stream
           cargo build --target wasm32-unknown-unknown --release
-      
+          echo "✓ event_stream built successfully"
+
       - name: Build live_poll contract
         run: |
           cd contracts/live_poll
           cargo build --target wasm32-unknown-unknown --release
-      
-      - name: Run contract tests
+          echo "✓ live_poll built successfully"
+
+      - name: Run contract tests (event_stream)
         run: |
           cd contracts/event_stream
-          cargo test --verbose
-          cd ../live_poll
-          cargo test --verbose
-      
+          cargo test --verbose 2>&1 | tee test-output.txt
+          echo "✓ event_stream tests passed"
+
+      - name: Run contract tests (live_poll)
+        run: |
+          cd contracts/live_poll
+          cargo test --verbose 2>&1 | tee test-output.txt
+          echo "✓ live_poll tests passed"
+
+      - name: Upload test output
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: contract-test-output
+          path: |
+            contracts/event_stream/test-output.txt
+            contracts/live_poll/test-output.txt
+          retention-days: 7
+
       - name: Optimize WASM files
         run: |
           cargo install --locked stellar-cli --features opt
           cd contracts/live_poll
           stellar contract optimize \
             --wasm target/wasm32-unknown-unknown/release/live_poll.wasm
-      
+          echo "✓ WASM optimized"
+
       - name: Upload WASM artifact
         uses: actions/upload-artifact@v4
         with:
