@@ -348,7 +348,7 @@ impl LivePollContract {
         
         // Verify caller is creator or moderator
         let is_creator = poll.creator == caller;
-        let is_moderator = Self::is_moderator(&env, &caller);
+        let is_moderator = Self::is_moderator(env.clone(), caller.clone());
         
         if !is_creator && !is_moderator {
             panic!("Only creator or moderator can close the poll");
@@ -510,7 +510,7 @@ impl LivePollContract {
     }
 
     fn validate_poll_input(
-        env: &Env,
+        _env: &Env,
         title: &String,
         description: &String,
         options: &Vec<String>,
@@ -551,7 +551,7 @@ impl LivePollContract {
             args.push_back(poll_id.into_val(env));
 
             // Try to notify, but don't fail if event contract doesn't exist
-            let _: Result<(), _> = env.try_invoke_contract(
+            let _ = env.try_invoke_contract::<Val, Val>(
                 &event_addr,
                 &Symbol::new(env, "notify"),
                 args,
