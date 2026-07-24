@@ -80,6 +80,11 @@ export interface TransactionRecord {
   timestamp: number;
   description: string;
   errorMessage?: string;
+  retryCount?: number;
+  lastRetryAt?: number;
+  confirmedAt?: number;
+  failedAt?: number;
+  ledger?: number;
 }
 
 /** Wallet connection state */
