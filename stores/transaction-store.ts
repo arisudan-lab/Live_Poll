@@ -163,15 +163,15 @@ export const useTransactionStore = create<TransactionStore>((set, get) => ({
   retryTransaction: async (hash: string) => {
     const { transactions, trackTransaction, updateTransaction } = get();
     const transaction = transactions.find((tx) => tx.hash === hash);
-    
+
     if (!transaction) {
       throw new Error("Transaction not found");
     }
-    
-    if (transaction.retryCount >= MAX_RETRY_ATTEMPTS) {
+
+    if ((transaction.retryCount || 0) >= MAX_RETRY_ATTEMPTS) {
       throw new Error("Max retry attempts reached");
     }
-    
+
     // Increment retry count
     updateTransaction(hash, {
       retryCount: (transaction.retryCount || 0) + 1,

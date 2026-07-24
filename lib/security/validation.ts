@@ -289,14 +289,14 @@ class RateLimiter {
   isAllowed(key: string): boolean {
     const now = Date.now();
     const userRequests = this.requests.get(key) || [];
-    
+
     // Remove old requests outside the window
-    const recentRequests = userRequests.filter(time => now - time < this.windowMS);
-    
+    const recentRequests = userRequests.filter(time => now - time < this.windowMs);
+
     if (recentRequests.length >= this.maxRequests) {
       return false;
     }
-    
+
     recentRequests.push(now);
     this.requests.set(key, recentRequests);
     

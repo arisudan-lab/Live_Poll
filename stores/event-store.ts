@@ -13,9 +13,10 @@ interface EventStore {
   setLastLedger: (ledger: number) => void;
   setPolling: (polling: boolean) => void;
   clearEvents: () => void;
+  getEventIds: () => Set<string>;
 }
 
-export const useEventStore = create<EventStore>((set) => ({
+export const useEventStore = create<EventStore>((set, get) => ({
   events: [],
   lastLedger: 0,
   isPolling: false,
@@ -35,4 +36,8 @@ export const useEventStore = create<EventStore>((set) => ({
   setLastLedger: (ledger) => set({ lastLedger: ledger }),
   setPolling: (polling) => set({ isPolling: polling }),
   clearEvents: () => set({ events: [], lastLedger: 0 }),
+  getEventIds: () => {
+    const state = get();
+    return new Set(state.events.map((e) => e.id));
+  },
 }));

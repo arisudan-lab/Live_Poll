@@ -33,7 +33,7 @@ export async function getTransactionStatus(
 
 /**
  * Wait for a transaction to finalize.
- * Resolves with the final status and transaction response.
+ * Resolves with the final status, ledger, and error message if any.
  */
 export async function waitForConfirmation(
   hash: string,
@@ -41,7 +41,8 @@ export async function waitForConfirmation(
   intervalMs = 2000
 ): Promise<{
   status: TransactionStatus;
-  response: rpc.Api.GetTransactionResponse | null;
+  ledger?: number;
+  error?: string;
 }> {
   const start = Date.now();
 
@@ -50,19 +51,25 @@ export async function waitForConfirmation(
       const response = await sorobanServer.getTransaction(hash);
 
       if (response.status === rpc.Api.GetTransactionStatus.SUCCESS) {
-        return { status: TransactionStatus.Success, response };
+        return { 
+          status: TransactionStatus.Success, 
+          ledger: response.ledger,
+        };
       }
       if (response.status === rpc.Api.GetTransactionStatus.FAILED) {
-        return { status: TransactionStatus.Failed, response };
+        return { 
+          status: TransactionStatus.Failed, 
+          error: "Transaction failed on-chain",
+        };
       }
-    } catch {
+    } catch (err) {
       // Continue polling on error
     }
 
     await new Promise((resolve) => setTimeout(resolve, intervalMs));
   }
 
-  return { status: TransactionStatus.Failed, response: null };
+  return { status: TransactionStatus.Failed, error: "Transaction confirmation timeout" };
 }
 
 /**
