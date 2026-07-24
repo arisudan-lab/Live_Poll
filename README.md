@@ -574,7 +574,7 @@ Contains:
 ![Voting](public/screenshots/vote.png)
 
 ### Analytics Dashboard
-![Analytics](public/screenshots/analytics.png)
+![Analytics](public/screenshots/dashboard.png)
 
 ### Activity Feed
 ![Activity](public/screenshots/activity.png)
@@ -584,6 +584,10 @@ Contains:
 
 ### Contract on Explorer
 ![Explorer](public/screenshots/contract_explorer.png)
+
+### Ci-CD Pipeline
+![Explorer](public/screenshots/ci_cd_pipeline.png)
+
 
 ---
 
