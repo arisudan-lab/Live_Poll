@@ -1,0 +1,249 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  NODE_VERSION: '20'
+  RUST_VERSION: 'stable'
+
+jobs:
+  # ============================================================================
+  # Smart Contracts Build & Test
+  # ============================================================================
+  contracts:
+    name: Smart Contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+          toolchain: ${{ env.RUST_VERSION }}
+      
+      - name: Cache Rust dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            contracts/**/target
+          key: ${{ runner.os }}-rust-${{ hashFiles('contracts/**/Cargo.toml') }}
+      
+      - name: Build event_stream contract
+        run: |
+          cd contracts/event_stream
+          cargo build --target wasm32-unknown-unknown --release
+      
+      - name: Build live_poll contract
+        run: |
+          cd contracts/live_poll
+          cargo build --target wasm32-unknown-unknown --release
+      
+      - name: Run contract tests
+        run: |
+          cd contracts/event_stream
+          cargo test --verbose
+          cd ../live_poll
+          cargo test --verbose
+      
+      - name: Optimize WASM files
+        run: |
+          cargo install --locked stellar-cli --features opt
+          cd contracts/live_poll
+          stellar contract optimize \
+            --wasm target/wasm32-unknown-unknown/release/live_poll.wasm
+      
+      - name: Upload WASM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: contracts-wasm
+          path: |
+            contracts/live_poll/target/wasm32-unknown-unknown/release/live_poll.wasm
+            contracts/event_stream/target/wasm32-unknown-unknown/release/event_stream.wasm
+          retention-days: 30
+
+  # ============================================================================
+  # Frontend Build & Test
+  # ============================================================================
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    needs: contracts
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Lint
+        run: npm run lint
+      
+      - name: Type check
+        run: npx tsc --noEmit
+      
+      - name: Run Jest tests
+        run: npm test -- --passWithNoTests --coverage
+      
+      - name: Run Vitest tests
+        run: npm run test:vitest -- --run
+      
+      - name: Build frontend
+        run: npm run build
+        env:
+          NEXT_PUBLIC_STELLAR_NETWORK: testnet
+          NEXT_PUBLIC_STELLAR_RPC_URL: https://soroban-testnet.stellar.org:443
+          NEXT_PUBLIC_CONTRACT_ID: CCA26PC7SVUMK43SVNHVSGQCTZ4NV3BSLDF7XV3ODHJVH5AFTYQWTJRU
+      
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: .next
+          retention-days: 7
+
+  # ============================================================================
+  # Security Scan
+  # ============================================================================
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: contracts
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      
+      - name: Run cargo audit
+        run: |
+          cargo install cargo-audit
+          cd contracts/live_poll
+          cargo audit
+          cd ../event_stream
+          cargo audit
+      
+      - name: Run npm audit
+        run: npm audit --audit-level=moderate
+
+  # ============================================================================
+  # Deploy to Vercel (on main branch)
+  # ============================================================================
+  deploy:
+    name: Deploy to Vercel
+    runs-on: ubuntu-latest
+    needs: [contracts, frontend, security]
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.url }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+      
+      - name: Download WASM artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: contracts-wasm
+          path: contracts-wasm
+      
+      - name: Pull Vercel environment
+        run: vercel pull --yes --environment=production --token=${{ VERCEL_TOKEN }}
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      
+      - name: Build project
+        run: vercel build --prod --token=${{ VERCEL_TOKEN }}
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          NEXT_PUBLIC_STELLAR_NETWORK: testnet
+          NEXT_PUBLIC_STELLAR_RPC_URL: https://soroban-testnet.stellar.org:443
+          NEXT_PUBLIC_CONTRACT_ID: ${{ vars.STELLAR_CONTRACT_ID }}
+      
+      - name: Deploy to Vercel
+        id: deploy
+        run: |
+          DEPLOY_OUTPUT=$(vercel deploy --prebuilt --prod --token=${{ VERCEL_TOKEN }})
+          echo "url=$DEPLOY_OUTPUT" >> $GITHUB_OUTPUT
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      
+      - name: Validate deployment
+        run: |
+          curl --fail --retry 3 --retry-delay 10 ${{ steps.deploy.outputs.url }} || exit 1
+
+  # ============================================================================
+  # Deploy Contracts to Testnet (optional, manual trigger)
+  # ============================================================================
+  deploy-contracts:
+    name: Deploy Contracts to Testnet
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    environment: testnet
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      
+      - name: Install Stellar CLI
+        run: cargo install --locked stellar-cli --features opt
+      
+      - name: Download WASM artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: contracts-wasm
+          path: contracts-wasm
+      
+      - name: Configure Stellar CLI
+        run: |
+          stellar network add testnet \
+            --rpc-url https://soroban-testnet.stellar.org:443 \
+            --network-passphrase "Test SDF Network ; September 2015"
+      
+      - name: Deploy live_poll contract
+        run: |
+          stellar contract deploy \
+            --wasm contracts-wasm/live_poll.wasm \
+            --source ${{ secrets.SOROBAN_ACCOUNT }} \
+            --network testnet \
+            --wait
+        env:
+          STELLAR_ACCOUNT_SECRET: ${{ secrets.SOROBAN_ACCOUNT_SECRET }}
+      
+      - name: Store deployment metadata
+        run: |
+          echo "Deployment completed at $(date)" > deployment-metadata.json
+          echo "Commit: ${{ github.sha }}" >> deployment-metadata.json
+          echo "Contract: live_poll" >> deployment-metadata.json
+      
+      - name: Upload deployment metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-metadata
+          path: deployment-metadata.json
