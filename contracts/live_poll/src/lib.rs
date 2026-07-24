@@ -469,16 +469,16 @@ impl LivePollContract {
             .unwrap_or_else(|| panic!("Contract not initialized"))
     }
     
-    /// Check if address is a moderator
-    pub fn is_moderator(env: &Env, addr: &Address) -> bool {
+    /// Check if address is a moderator (read-only, no auth required)
+    pub fn is_moderator(env: Env, addr: Address) -> bool {
         let moderators: Vec<Address> = env
             .storage()
             .instance()
             .get(&DataKey::Moderators)
-            .unwrap_or_else(|| Vec::new(env));
-        
+            .unwrap_or_else(|| Vec::new(&env));
+
         for moderator in moderators.iter() {
-            if moderator == *addr {
+            if moderator == addr {
                 return true;
             }
         }
@@ -503,12 +503,12 @@ impl LivePollContract {
             .instance()
             .get(&DataKey::Admin)
             .unwrap_or_else(|| panic!("Contract not initialized"));
-        
-        if *addr != admin {
+
+        if addr != &admin {
             panic!("Caller is not admin");
         }
     }
-    
+
     fn validate_poll_input(
         env: &Env,
         title: &String,
@@ -519,12 +519,12 @@ impl LivePollContract {
         if title.len() == 0 || title.len() > 200 {
             panic!("Title must be between 1 and 200 characters");
         }
-        
+
         // Description validation
         if description.len() > 1000 {
             panic!("Description cannot exceed 1000 characters");
         }
-        
+
         // Options validation
         if options.len() < 2 {
             panic!("Poll must have at least 2 options");
@@ -532,7 +532,7 @@ impl LivePollContract {
         if options.len() > 10 {
             panic!("Poll cannot have more than 10 options");
         }
-        
+
         // Validate each option label
         for option in options.iter() {
             if option.len() == 0 || option.len() > 100 {
@@ -549,21 +549,13 @@ impl LivePollContract {
             args.push_back(topic.into_val(env));
             args.push_back(source.into_val(env));
             args.push_back(poll_id.into_val(env));
-            
+
             // Try to notify, but don't fail if event contract doesn't exist
-            let result: Result<(), soroban_sdk::Error> = env.try_invoke_contract(
+            let _: Result<(), _> = env.try_invoke_contract(
                 &event_addr,
                 &Symbol::new(env, "notify"),
                 args,
             );
-            
-            if result.is_err() {
-                // Log but don't fail the main operation
-                env.logs().add(
-                    Symbol::new(env, "event_notification_failed"),
-                    &String::from_str(env, "Event contract notification failed"),
-                );
-            }
         }
     }
 }
