@@ -1,6 +1,6 @@
 #![no_std]
 
-use soroban_sdk::{contract, contractimpl, contracttype, symbol_short, Address, Env, String, Symbol, Vec};
+use soroban_sdk::{contract, contractimpl, contracttype, symbol_short, Address, Env, Symbol, Vec};
 
 // ============================================================================
 // Data Structures
@@ -186,9 +186,9 @@ impl EventStreamContract {
         let mut fetched = 0;
         let mut current_id = total_events;
         let max_limit = limit.min(100);
-        
+
         while current_id > 0 && fetched < max_limit {
-            if let Some(event) = env.storage().persistent().get(&DataKey::Event(current_id)) {
+            if let Some(event) = env.storage().persistent().get::<DataKey, EventRecord>(&DataKey::Event(current_id)) {
                 if event.event_type == topic {
                     if fetched >= start {
                         results.push_back(event);
