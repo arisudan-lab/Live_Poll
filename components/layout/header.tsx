@@ -16,6 +16,8 @@ import {
   LayoutDashboard,
   Menu,
   X,
+  Settings,
+  TrendingUp,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -23,8 +25,10 @@ const navItems = [
   { href: "/", label: "Home", icon: Vote },
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/polls", label: "Polls", icon: BarChart3 },
+  { href: "/analytics", label: "Analytics", icon: TrendingUp },
   { href: "/activity", label: "Activity", icon: Activity },
   { href: "/transactions", label: "Transactions", icon: History },
+  { href: "/settings", label: "Settings", icon: Settings },
 ];
 
 export function Header() {
