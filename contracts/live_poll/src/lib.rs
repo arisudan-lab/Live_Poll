@@ -539,9 +539,7 @@ impl LivePollContract {
                 panic!("Option labels must be between 1 and 100 characters");
             }
         }
-        
-        // Validate end time if provided
-        let current_time = env.ledger().timestamp();
+
         // Note: end_time validation is done in the calling function
     }
     
